@@ -1,7 +1,7 @@
 import net from 'net';
 import dgram from 'dgram';
 
-function isHostUp(host, port = 80, timeout = 4000) {
+function isHostUp(host, port = 9, timeout = 4000) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
     socket.setTimeout(timeout);
