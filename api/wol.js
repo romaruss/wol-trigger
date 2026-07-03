@@ -18,7 +18,8 @@ export default async function handler(req, res) {
     return res.status(403).send('Non autorizzato');
   }
 
-  const up = await isHostUp(process.env.HOME_HOST);
+  //const up = await isHostUp(process.env.HOME_HOST);
+  const up = await isHostUp(process.env.HOME_HOST, 9);
   if (!up) {
     return res.status(200).send('Router non raggiungibile, nessuna azione');
   }
