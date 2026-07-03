@@ -14,6 +14,7 @@ export default function handler(req, res) {
   const socket = dgram.createSocket('udp4');
   socket.send(packet, 9, process.env.HOME_HOST, (err) => {
     socket.close();
+    console.log('Host:', process.env.HOME_HOST);
     if (err) return res.status(500).send('Errore invio');
     res.status(200).send('WOL inviato');
   });
