@@ -19,7 +19,8 @@ export default async function handler(req, res) {
   }
 
   //const up = await isHostUp(process.env.HOME_HOST);
-  const up = await isHostUp(process.env.HOME_HOST, 9);
+  //const up = await isHostUp(process.env.HOME_HOST, 9);
+  const up =true;
   if (!up) {
     return res.status(200).send('Router non raggiungibile, nessuna azione');
   }
