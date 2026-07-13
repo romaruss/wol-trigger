@@ -31,7 +31,18 @@ export default async function handler(req, res) {
   const packet = Buffer.concat([magic, ...Array(16).fill(macBuf)]);
 
   const socket = dgram.createSocket('udp4');
-  socket.send(packet, 9, process.env.HOME_HOST, (err) => {
+  socket.bind(() => {
+    socket.setBroadcast(true); // FONDAMENTALE
+  });
+  // Aggiungi queste righe dopo la creazione del socket
+const socket = dgram.createSocket('udp4');
+socket.bind(() => {
+  socket.setBroadcast(true); // FONDAMENTALE
+});
+
+// E nell'invio, usa l'indirizzo di broadcast della tua rete
+// NON usare l'IP pubblico, devi avere un gateway VPN o un tunnel
+socket.send(packet, 9, '192.168.1.255', (err) => { 
     socket.close();
     if (err) return res.status(500).send('Errore invio: ' + err.message);
     res.status(200).send('Router su, WOL inviato');
