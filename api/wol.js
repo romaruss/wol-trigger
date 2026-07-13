@@ -1,28 +1,9 @@
-import net from 'net';
 import dgram from 'dgram';
-
-function isHostUp(host, port = 9, timeout = 4000) {
-  return new Promise((resolve) => {
-    const socket = new net.Socket();
-    socket.setTimeout(timeout);
-    socket.on('connect', () => { socket.destroy(); resolve(true); });
-    socket.on('error', () => resolve(true));   // porta chiusa ma host raggiungibile = router acceso
-    socket.on('timeout', () => { socket.destroy(); resolve(false); }); // nessuna risposta = router spento
-    socket.connect(port, host);
-  });
-}
 
 export default async function handler(req, res) {
   const { token } = req.query;
   if (token !== process.env.SECRET_TOKEN) {
     return res.status(403).send('Non autorizzato');
-  }
-
-  //const up = await isHostUp(process.env.HOME_HOST);
-  //const up = await isHostUp(process.env.HOME_HOST, 9);
-  const up =true;
-  if (!up) {
-    return res.status(200).send('Router non raggiungibile, nessuna azione');
   }
 
   const mac = process.env.SERVER_MAC.replace(/:/g, '');
@@ -31,20 +12,15 @@ export default async function handler(req, res) {
   const packet = Buffer.concat([magic, ...Array(16).fill(macBuf)]);
 
   const socket = dgram.createSocket('udp4');
+  
   socket.bind(() => {
-    socket.setBroadcast(true); // FONDAMENTALE
-  });
-  // Aggiungi queste righe dopo la creazione del socket
-const socket = dgram.createSocket('udp4');
-socket.bind(() => {
-  socket.setBroadcast(true); // FONDAMENTALE
-});
-
-// E nell'invio, usa l'indirizzo di broadcast della tua rete
-// NON usare l'IP pubblico, devi avere un gateway VPN o un tunnel
-socket.send(packet, 9, '192.168.1.255', (err) => { 
-    socket.close();
-    if (err) return res.status(500).send('Errore invio: ' + err.message);
-    res.status(200).send('Router su, WOL inviato');
+    socket.setBroadcast(true);
+    
+    // Invia al broadcast della rete locale
+    socket.send(packet, 9, '192.168.1.255', (err) => {
+      socket.close();
+      if (err) return res.status(500).send('Errore: ' + err.message);
+      res.status(200).send('WoL inviato in broadcast locale');
+    });
   });
 }
