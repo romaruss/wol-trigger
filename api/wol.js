@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     socket.setBroadcast(true);
     
     // Invia al broadcast della rete locale
-    socket.send(packet, 9, '192.168.1.255', (err) => {
+    socket.send(packet, 9, '192.168.1.154', (err) => {
       socket.close();
       if (err) return res.status(500).send('Errore: ' + err.message);
       res.status(200).send('WoL inviato in broadcast locale');
